@@ -13,4 +13,5 @@ interface JobRepository : ReactiveMongoRepository<Job, String> {
     @DeleteQuery(value = "{'docId': ?0 }")
     fun deleteJob(docId: String): Flux<Job>
 
+    fun findAllByOrderByCreatedAtDesc(): Flux<Job>
 }

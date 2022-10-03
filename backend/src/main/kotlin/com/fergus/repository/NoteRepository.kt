@@ -19,5 +19,7 @@ interface NoteRepository : ReactiveMongoRepository<Note, String> {
     // @Query(value = "{'jobId': ?0 }")
     fun findAllByJobId(jobId: String): Flux<Note>
 
+    fun findAllByJobIdOrderByCreatedAtDesc(jobId: String): Flux<Note>
+
     fun countByJobId(jobId: String): Mono<Long>
 }

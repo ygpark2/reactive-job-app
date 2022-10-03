@@ -98,28 +98,29 @@ export class HomeComponent implements OnInit {
         jwt: this.credentialsService.credentials?.token
       }
     });
-    modalRef.afterClose.next((result: any) => {
-      console.log("================ after close next ===============");
-      console.log(result);
-
-      const jobList = result.jobList as Array<ResponseJob>;
-      this.jobMessages.splice(0);
-
-      console.log("-------------- done -----------");
-      console.log(this.jobMessages);
-      /*
-      this.jobMessages = jobList.map((job, index) => {
-        return {
-          date: new Date(),
-          loading: true,
-          job: job
-        } as JobMessage;
-      });
-      */
+    modalRef.afterClose.subscribe({
+      next: (result: any) => {
+        const jobList = result.jobList as ResponseJob[];
+        this.jobMessages.splice(0);
+        this.jobMessages = jobList.map((job) => {
+          return {
+            date: new Date(),
+            loading: false,
+            job: job
+          } as JobMessage;
+        });
+        console.log("jobMsg => ", this.jobMessages);
+      },
+      error: (err) => {
+        this.notificationService.error(
+          'Error on loading job data',
+          err,
+          {nzDuration: 1500}
+        );
+      },
+      complete: () => console.log('done'),
     });
-    modalRef.afterClose.error((err:any) => {
-      console.log("error => ", err);
-    });
+
   }
 
   showJobFormModal(rspJob: ResponseJob): void {
@@ -147,7 +148,7 @@ export class HomeComponent implements OnInit {
   }
 
   deleteJobFormModal(rspJob: ResponseJob): void {
-    this.modalService.confirm({
+    const modalRef = this.modalService.confirm({
       nzTitle: 'Do you Want to delete this job ?',
       nzContent: DeleteJobModalHomeComponent,
       nzComponentParams: {
@@ -187,6 +188,39 @@ export class HomeComponent implements OnInit {
           });
         }
         }
+    });
+
+    modalRef.afterClose.subscribe({
+      next: (result: any) => {
+        this.jobMessages.splice(0);
+        const jwt = this.credentialsService.credentials?.token;
+        if (jwt) {
+          this.jobApiService?.getJobs(jwt ?? '').then((response) => {
+            const jobList = response.data as ResponseJob[];
+            this.jobMessages = jobList.map((job) => {
+              return {
+                date: new Date(),
+                loading: false,
+                job: job
+              } as JobMessage;
+            });
+            console.log("jobMsg => ", this.jobMessages);
+          }).catch(error => {
+            console.log("error => ", error.message);
+            console.log("error => ", error.status);
+          }).finally(() => {
+            console.log("final called!!!!");
+          });
+        }
+      },
+      error: (err) => {
+        this.notificationService.error(
+          'Error on loading job data',
+          err,
+          {nzDuration: 1500}
+        );
+      },
+      complete: () => console.log('done'),
     });
   }
 

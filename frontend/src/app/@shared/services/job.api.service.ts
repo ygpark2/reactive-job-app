@@ -41,13 +41,13 @@ export class JobApiService extends BaseService {
   pageSize: number = 2;
 
   @GET('')
-  async getJobs(@Header("Authorization") authorization: string): Promise<Response<ResponseJob>> {
-    return <Response<ResponseJob>>{};
+  async getJobs(@Header("Authorization") authorization: string): Promise<Response<Array<ResponseJob>>> {
+    return <Response<Array<ResponseJob>>>{};
   }
 
   @POST('')
-  async createJob(@Header("Authorization") authorization: string, @Body jobDto: JobDto): Promise<Response<Array<ResponseJob>>> {
-    return <Response<Array<ResponseJob>>>{};
+  async createJob(@Header("Authorization") authorization: string, @Body jobDto: JobDto): Promise<Response<ResponseJob>> {
+    return <Response<ResponseJob>>{};
   }
 
   @GET('{jobId}')

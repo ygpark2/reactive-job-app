@@ -4,6 +4,7 @@ import com.fergus.model.Address
 import com.fergus.model.Job
 import com.fergus.model.Status
 import com.fergus.repository.JobRepository
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -13,6 +14,8 @@ import reactor.core.publisher.Mono
 class JobService(private val jobRepository: JobRepository) {
 
     fun findAll() = jobRepository.findAll()
+
+    fun findAll(sort: Sort) = jobRepository.findAll(sort)
 
     fun count() = jobRepository.count()
 

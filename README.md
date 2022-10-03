@@ -112,3 +112,17 @@ here -> // target: 'http://app:8090',  // in case of docker
 ```
 and uncomment the target api url according to your setup environment.
 
+## Screen Shot
+
+1. Login
+   ![alt text](./images/login.png)
+2. Signup
+   ![alt text](./images/signup.png)
+3. Job List
+   ![alt text](./images/job_list.png)3. 
+4. New Job
+   ![alt text](./images/new_job.png)
+5. Edit Job
+   ![alt text](./images/edit_job.png)
+6. Delete Job
+   ![alt text](./images/delete_job.png)

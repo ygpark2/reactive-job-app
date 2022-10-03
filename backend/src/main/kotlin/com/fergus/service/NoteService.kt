@@ -3,6 +3,7 @@ package com.fergus.service
 import com.fergus.model.Job
 import com.fergus.model.Note
 import com.fergus.repository.NoteRepository
+import org.springframework.data.domain.Sort
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -14,11 +15,13 @@ class NoteService(private val noteRepository: NoteRepository) {
 
     fun findAll() = noteRepository.findAll()
 
+    fun findAll(sort: Sort) = noteRepository.findAll(sort)
+
     fun count() = noteRepository.count()
 
     fun findOne(id: String): Mono<Note> = this.noteRepository.findById(id)
 
-    fun findAllByJobId(id: String): Flux<Note> = this.noteRepository.findAllByJobId(id)
+    fun findAllByJobId(id: String): Flux<Note> = this.noteRepository.findAllByJobIdOrderByCreatedAtDesc(id)
 
     fun countByJobId(id: String): Mono<Long> = this.noteRepository.countByJobId(id)
 

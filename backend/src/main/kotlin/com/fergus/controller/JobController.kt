@@ -14,6 +14,7 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.runBlocking
+import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -29,7 +30,7 @@ class JobController(
 ) {
 
     @GetMapping
-    fun findAll(): Flux<Job> = jobService.findAll()
+    fun findAll(): Flux<Job> = jobService.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
 
     @GetMapping("count")
     suspend fun count(): Long? = jobService.count().awaitFirstOrNull()
