@@ -48,7 +48,7 @@ class JobController(
 
     @DeleteMapping("{jobId}")
     suspend fun deleteJob(@PathVariable jobId: String)  {
-        noteService.deleteByJobId(jobId).then(jobService.deleteJob(jobId)).awaitFirstOrNull()
+        noteService.deleteAllByJobId(jobId).then(jobService.deleteJob(jobId)).awaitFirstOrNull()
     }
 
     @PostMapping
@@ -58,7 +58,7 @@ class JobController(
     }
 
     @GetMapping("{jobId}/notes")
-    fun findNotesByJobId(@PathVariable jobId: String): Flux<List<Note>> = noteService.findByJobId(jobId)
+    fun findNotesByJobId(@PathVariable jobId: String): Flux<Note> = noteService.findAllByJobId(jobId)
 
     @GetMapping("{jobId}/notes/count")
     suspend fun countNotesByJobId(@PathVariable jobId: String): Long? = noteService.countByJobId(jobId).awaitFirstOrNull()

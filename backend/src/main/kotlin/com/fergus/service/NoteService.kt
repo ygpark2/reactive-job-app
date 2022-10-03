@@ -18,7 +18,7 @@ class NoteService(private val noteRepository: NoteRepository) {
 
     fun findOne(id: String): Mono<Note> = this.noteRepository.findById(id)
 
-    fun findByJobId(id: String): Flux<List<Note>> = this.noteRepository.findByJobIdAll(id)
+    fun findAllByJobId(id: String): Flux<Note> = this.noteRepository.findAllByJobId(id)
 
     fun countByJobId(id: String): Mono<Long> = this.noteRepository.countByJobId(id)
 
@@ -42,5 +42,5 @@ class NoteService(private val noteRepository: NoteRepository) {
         return this.noteRepository.deleteById(id)
     }
 
-    fun deleteByJobId(jobId: String): Mono<Void> = this.noteRepository.deleteByJobId(jobId)
+    fun deleteAllByJobId(jobId: String): Mono<Void> = this.noteRepository.deleteAllByJobId(jobId)
 }

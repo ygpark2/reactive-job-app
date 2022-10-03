@@ -66,24 +66,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 
     noteForm!: FormGroup;
     
-    noteData = [
-      {
-        author: 'Han Solo',
-        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-        content:
-          'We supply a series of design principles, practical patterns and high quality design resources' +
-          '(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-        datetime: formatDistance(new Date(), addDays(new Date(), 1))
-      },
-      {
-        author: 'Han Solo',
-        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-        content:
-          'We supply a series of design principles, practical patterns and high quality design resources' +
-          '(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-        datetime: formatDistance(new Date(), addDays(new Date(), 2))
-      }
-    ];
+    noteData = [ {author: '', avatar: '', content: '', datetime: '' } ];
 
     constructor(private modal: NzModalRef, private notificationService: NzNotificationService, private formBuilder: FormBuilder) {
       
@@ -92,7 +75,15 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
     private loadNoteList() {
       if (this.jwt && this.rspJob?.docId) {
         this.jobApiService?.getNoteListByJob(this.jwt, this.rspJob?.docId).then((response) => {
-          
+          this.noteData.splice(0);
+          this.noteData = response.data.map((note) => {
+            return {
+              author: 'Test User',
+              avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+              content: note.content as string,
+              datetime: '' // note.createdAt.toDateString() // formatDistance(new Date(), note.createdAt)
+            }
+          });
           console.log("response data => ", response.data );
           console.log("----------------------- note list ----------------");
         }).catch(error => {
@@ -133,6 +124,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
               "The note was successfully created.",
               {nzDuration: 1500}
             );
+            this.loadNoteList();
           }).catch(error => {
             console.log("error => ", error.message);
             console.log("error => ", error.status);

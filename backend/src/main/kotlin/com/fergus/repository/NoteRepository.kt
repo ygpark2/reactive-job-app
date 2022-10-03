@@ -14,9 +14,10 @@ import reactor.core.publisher.Mono
 interface NoteRepository : ReactiveMongoRepository<Note, String> {
 
     @DeleteQuery(value = "{'jobId': ?0 }")
-    fun deleteByJobId(jobId: String): Mono<Void>
+    fun deleteAllByJobId(jobId: String): Mono<Void>
 
-    fun findByJobIdAll(jobId: String): Flux<List<Note>>
+    // @Query(value = "{'jobId': ?0 }")
+    fun findAllByJobId(jobId: String): Flux<Note>
 
     fun countByJobId(jobId: String): Mono<Long>
 }
