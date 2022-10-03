@@ -1,0 +1,65 @@
+package com.fergus.repository
+
+import com.fergus.config.exception.JobNotFoundException
+import com.fergus.model.Address
+import com.fergus.model.Job
+import com.fergus.model.Status
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.data.mongodb.core.*
+import org.springframework.data.mongodb.core.query.*
+import org.springframework.data.mongodb.core.query.Query.query
+import org.springframework.http.codec.ServerSentEvent
+import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+
+
+@Component
+class JobRepository(private val mongo: ReactiveFluentMongoOperations) {
+
+    suspend fun count(): Long = mongo.query<Job>().count().awaitSingle()
+
+    fun findAll(): Flow<Job> = mongo.query<Job>().flow()
+
+    suspend fun findOne(id: String): Job = mongo.query<Job>()
+        .matching(Query.query(Criteria.where("docId").isEqualTo(id))).awaitOne() ?: throw JobNotFoundException(id)
+
+    suspend fun deleteOne(id: String): Job = mongo.remove<Job>()
+        .matching(Query.query(Criteria.where("docId").isEqualTo(id))).findAndRemove().blockFirst() ?: throw JobNotFoundException(id)
+
+    suspend fun deleteAll(): Long = mongo.remove<Job>().allAndAwait().deletedCount
+
+    suspend fun save(job: Job): Job = mongo.insert<Job>().oneAndAwait(job)
+
+    suspend fun update(job: Job) = mongo.update<Job>()
+        // ..matching(query(Criteria.where("docId").isEqualTo(job.id)))
+        // ..apply(Update.update("name",job.name)
+        // .    .set("phone", job.phone)
+        // .    .set("address.addressLine", job.address.addressLine)
+        // .    .set("address.city", job.address.city)
+        // .    .set("address.street", job.address.street)
+        // .    .set("address.postCode", job.address.postCode)
+        // .    .set("status", job.status)
+        // .).findAndModify()
+        .replaceWith(job)
+        .asType<Job>().findReplaceAndAwait()
+
+    suspend fun findByStreet(street: String): Flux<Job> = mongo.query<Job>()
+        .matching(Query.query(Criteria.where("address.street").isEqualTo(street))).all() ?: throw JobNotFoundException(street)
+
+    suspend fun findByCity(city: String): Flux<Job> = mongo.query<Job>()
+        .matching(Query.query(Criteria.where("address.city").isEqualTo(city))).all() ?: throw JobNotFoundException(city)
+
+    suspend fun findByPostCode(postCode: String): Flux<Job> = mongo.query<Job>()
+        .matching(Query.query(Criteria.where("address.postCode").regex(postCode))).all() ?: throw JobNotFoundException(postCode)
+
+    suspend fun findByName(name: String): Flux<Job> = mongo.query<Job>()
+        .matching(Query.query(Criteria.where("name").regex(name))).all() ?: throw JobNotFoundException(name)
+
+    suspend fun init() {
+        val address1 = Address("test 1", "street 1", "city 1", "2083")
+        val address2 = Address("test 2", "street 2", "city 2", "2084")
+        save(Job("My first job", "+83 3828372", address1, Status.ACTIVE))
+        save(Job("My second job", "+83 3828372", address2, Status.COMPLETED))
+    }
+}

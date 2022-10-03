@@ -1,0 +1,21 @@
+<div class="container-fluid">
+  <div class="jumbotron text-center">
+    <h1>
+      <span translate>APP_NAME</span>
+    </h1>
+    <div class="file">
+      <p>{{ slides.name }}</p>
+      <button nz-button nzType="primary" (click)="download(slides)">Download</button>
+    </div>
+    <nz-progress
+      *ngIf="download$ | async as download"
+      [nzStatus]="download.state === 'PENDING' ? 'active' : 'success'"
+      [nzPercent]="download.progress"
+    ></nz-progress>
+    <p><i class="far fa-bookmark"></i> <span translate>Version</span> {{ version }}</p>
+
+    <a target="_self" href="/api/v1/file/download?id=49087"><h3>Download Link</h3></a>
+  </div>
+</div>
+
+<hr />

@@ -1,0 +1,38 @@
+server.port: 8090
+
+app:
+  secret: secret
+  refresh: refresh
+  cors: http://localhost:4200
+  first_user:
+    username: "user@example.com"
+    password: "userPassword"
+
+
+spring:
+  output.ansi.enabled: ALWAYS
+  mongodb.embedded.version: 4.0.2
+  data:
+    mongodb:
+      uri: mongodb://admin:password@mongodb:27017/mongo-db?authSource=admin
+      database: mongo-db
+      username: admin
+      password: password
+      authentication-database: admin
+  security:
+    basic:
+      enable: false
+    # ignored: /**
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /docs
+
+---
+spring:
+  config.activate.on-profile: production
+  data:
+    mongodb:
+      host: mongo

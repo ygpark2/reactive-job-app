@@ -1,0 +1,43 @@
+package com.fergus.repository
+
+import com.fergus.config.exception.JobNotFoundException
+import com.fergus.config.exception.NoteNotFoundException
+import com.fergus.model.Job
+import com.fergus.model.Note
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.data.mongodb.core.*
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.isEqualTo
+import org.springframework.stereotype.Component
+
+
+@Component
+class NoteRepository(private val mongo: ReactiveFluentMongoOperations) {
+
+    suspend fun save(note: Note): Note = mongo.insert<Note>().oneAndAwait(note)
+
+    suspend fun findOne(id: String): Note = mongo.query<Note>()
+        .matching(Query.query(Criteria.where("docId").isEqualTo(id))).awaitOne() ?: throw NoteNotFoundException(id)
+
+    suspend fun countByJobId(jobId: String): Long = mongo.query<Note>()
+        .matching(Query.query(Criteria.where("jobId").isEqualTo(jobId)))
+        .count().awaitSingle()
+
+    fun findByJobId(jobId: String): Flow<Note> = mongo.query<Note>()
+        .matching(Query.query(Criteria.where("jobId").isEqualTo(jobId))).flow()
+
+    suspend fun deleteOne(id: String): Note = mongo.remove<Note>()
+        .matching(Query.query(Criteria.where("docId").isEqualTo(id))).findAndRemove().blockFirst() ?: throw NoteNotFoundException(id)
+
+    suspend fun update(note: Note) = mongo.update<Note>()
+        //  .matching(query(where("id").isEqualTo(id)))
+        //  .apply(Update.update("name",job.name!!).set("phone", job.phone!!))
+        .replaceWith(note)
+        .asType<Note>().findReplaceAndAwait()
+
+    suspend fun deleteByJobId(jobId: String): Long = mongo.remove<Note>()
+        .matching(Query.query(Criteria.where("jobId").isEqualTo(jobId))).allAndAwait().deletedCount
+
+}

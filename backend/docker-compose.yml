@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  app:
+    container_name: spring-api-app
+    image: api-app:latest
+    build:
+      context: ${BACKEND_PROJECT_PATH:-.} # Use an image built from the specified dockerfile in the `ain-app-server` directory.
+      dockerfile: Dockerfile
+      target: DEV_ENV
+    working_dir: /app
+    user: appuser
+    command: ["./gradlew", "--project-cache-dir", "/tmp/gradle-cache", "bootRun", "-Pdebug"] # --debug-jvm
+    # command: [“./gradlew”, “bootrun”]
+    # entrypoint: [“./gradlew”, “bootrun”]
+    ports:
+      - "8090:8090"
+    volumes:
+      - ${BACKEND_PROJECT_PATH:-.}/:/app
+      - ${BACKEND_PROJECT_PATH:-.}/.gradle:/appuser/.gradle
+    depends_on:
+      - mongodb
+    restart: on-failure
+    networks:
+      - devnet
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:6
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: mongo-db
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./data/mongodb:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+      start_period: 40s
+#      test: [ "CMD", "mongo", "--eval", "\"db.adminCommand('ping')\"" ]
+    networks:
+      - devnet
+
+networks:
+  devnet:
+    driver: bridge
