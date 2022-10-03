@@ -119,7 +119,7 @@ and uncomment the target api url according to your setup environment.
 2. Signup
    ![alt text](./images/signup.png)
 3. Job List
-   ![alt text](./images/job_list.png)3. 
+   ![alt text](./images/job_list.png) 
 4. New Job
    ![alt text](./images/new_job.png)
 5. Edit Job
