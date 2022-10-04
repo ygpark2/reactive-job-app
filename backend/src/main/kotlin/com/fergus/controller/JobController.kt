@@ -1,6 +1,7 @@
 package com.fergus.controller
 
 import com.fergus.dto.JobDto
+import com.fergus.dto.JobQueryDto
 import com.fergus.dto.NoteDto
 import com.fergus.model.Note
 import com.fergus.model.Job
@@ -14,6 +15,8 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.runBlocking
+import org.springframework.data.domain.Example
+import org.springframework.data.domain.ExampleMatcher
 import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -30,7 +33,18 @@ class JobController(
 ) {
 
     @GetMapping
-    fun findAll(): Flux<Job> = jobService.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
+    fun findAll(
+        @RequestParam(required = false) filterFieldName: String?,
+        @RequestParam(required = false) filterValue: String?,
+        @RequestParam(required = false) sortFieldName: String?,
+        @RequestParam(required = false) sortOrder: String?,
+    ): Flux<Job> {
+        val jobQueryDto = JobQueryDto(filterFieldName, filterValue, sortFieldName, sortOrder)
+        jobQueryDto.getExample()?.let {
+            return jobService.findAll(it, jobQueryDto.getSort())
+        }
+        return jobService.findAll(jobQueryDto.getSort())
+    }
 
     @GetMapping("count")
     suspend fun count(): Long? = jobService.count().awaitFirstOrNull()

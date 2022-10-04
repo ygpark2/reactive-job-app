@@ -3,6 +3,7 @@ package com.fergus.service
 import com.fergus.model.Job
 import com.fergus.model.Note
 import com.fergus.repository.NoteRepository
+import org.springframework.data.domain.Example
 import org.springframework.data.domain.Sort
 
 import org.springframework.stereotype.Service
@@ -14,6 +15,8 @@ import reactor.core.publisher.Mono
 class NoteService(private val noteRepository: NoteRepository) {
 
     fun findAll() = noteRepository.findAll()
+
+    fun findAll(example: Example<Note>, sort: Sort) = noteRepository.findAll(example, sort)
 
     fun findAll(sort: Sort) = noteRepository.findAll(sort)
 

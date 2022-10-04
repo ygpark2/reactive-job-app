@@ -4,6 +4,7 @@ import com.fergus.model.Address
 import com.fergus.model.Job
 import com.fergus.model.Status
 import com.fergus.repository.JobRepository
+import org.springframework.data.domain.Example
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -14,6 +15,8 @@ import reactor.core.publisher.Mono
 class JobService(private val jobRepository: JobRepository) {
 
     fun findAll() = jobRepository.findAll()
+
+    fun findAll(example: Example<Job>, sort: Sort) = jobRepository.findAll(example, sort)
 
     fun findAll(sort: Sort) = jobRepository.findAll(sort)
 
